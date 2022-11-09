@@ -27,6 +27,12 @@ class Database:
     def __init__(self):
         self.connect()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+
     def connect(self):
         DB_CONNECTION = os.getenv('DB_CONNECTION', '')
         DATABASE_URL = os.getenv('DATABASE_URL', '')
@@ -156,9 +162,9 @@ class Database:
         return messages_servers
 
     def distinct_servers(self):
-        """Get distinct servers (Query server purpose) (Only fetch game_id, address, query_port, query_extra, status, result, style_data)"""
+        """Get distinct servers (Query server purpose) (Only fetch game_id, address, query_port, query_extra, status, result)"""
         cursor = self.conn.cursor()
-        cursor.execute('SELECT DISTINCT game_id, address, query_port, query_extra, status, result, style_data FROM servers')
+        cursor.execute('SELECT DISTINCT game_id, address, query_port, query_extra, status, result FROM servers')
         servers = [Server.from_distinct_query(row) for row in cursor.fetchall()]
         cursor.close()
 
